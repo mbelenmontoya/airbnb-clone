@@ -1,9 +1,9 @@
 import houses from '../houses.js'
 import House from '../components/House'
+import Layout from '../components/Layout'
 
-export default function Home() {
-  return (
-    <div>
+const content = (
+  <div>
       <h2>Places to stay</h2>
 
       <div className="houses">
@@ -21,5 +21,8 @@ export default function Home() {
         }
       `}</style>
     </div>
-  )
+)
+
+export default function Home() {
+  return <Layout content={content} />
 }
