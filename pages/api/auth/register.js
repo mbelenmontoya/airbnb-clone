@@ -1,4 +1,5 @@
 import { User } from '../../../model.js'
+import Cookies from 'cookies'
 
 const randomString = (length) => {
   const chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
@@ -28,7 +29,7 @@ export default async (req, res) => {
 
   if (!user) {
     user = await User.create({ email, password })
-    
+
     const sessionToken = randomString(255)
     const d = new Date()
     d.setDate(d.getDate() + 30)
@@ -39,6 +40,11 @@ export default async (req, res) => {
       },
       { where: { email } }
     )
+
+    const cookies = new Cookies(req, res)
+    cookies.set('nextbnb_session', sessionToken, {
+      httpOnly: true // true by default
+    })
 
     res.end(JSON.stringify({ status: 'success', message: 'User added' }))
   } else {
