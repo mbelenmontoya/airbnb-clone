@@ -1,13 +1,16 @@
 import Link from "next/link";
-import { useStoreActions } from "easy-peasy";
+import { useStoreState, useStoreActions } from "easy-peasy";
 
 export default function Header(props) {
   const setShowLoginModal = useStoreActions(
     (actions) => actions.modals.setShowLoginModal
-  );
+  )
   const setShowRegistrationModal = useStoreActions(
     (actions) => actions.modals.setShowRegistrationModal
-  );
+  )
+
+  const loggedIn = useStoreState((state) => state.login.loggedIn)
+  const setLoggedIn = useStoreActions((actions) => actions.login.setLoggedIn)
 
   return (
     <div className="nav-container">
@@ -17,20 +20,30 @@ export default function Header(props) {
         </a>
       </Link>
 
-      <nav>
-        <ul>
-          <li>
-            <a href="#" onClick={() => setShowRegistrationModal()}>
-              Sign up
-            </a>
-          </li>
-          <li>
-            <a href="#" onClick={() => setShowLoginModal()}>
-              Log in
-            </a>
-          </li>
-        </ul>
-      </nav>
+      {loggedIn ? (
+        <nav>
+          <ul>
+            <li>
+              <a>Logged in</a>
+            </li>
+          </ul>
+        </nav>
+      ) : (
+        <nav>
+          <ul>
+            <li>
+              <a href="#" onClick={() => setShowRegistrationModal()}>
+                Sign up
+              </a>
+            </li>
+            <li>
+              <a href="#" onClick={() => setShowLoginModal()}>
+                Log in
+              </a>
+            </li>
+          </ul>
+        </nav>
+      )}
 
       <style jsx>{`
         ul {
@@ -68,5 +81,5 @@ export default function Header(props) {
         }
       `}</style>
     </div>
-  );
+  )
 }

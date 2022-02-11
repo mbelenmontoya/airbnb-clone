@@ -1,30 +1,37 @@
-import { useState } from "react";
-import Head from "next/head";
-import houses from "../../houses.js";
-import Layout from "../../components/Layout";
-import DateRangePicker from "../../components/DateRangePicker";
-import { useStoreActions } from "easy-peasy";
+import { useState, useEffect } from "react"
+import Head from "next/head"
+import houses from "../../houses.js"
+import Layout from "../../components/Layout"
+import DateRangePicker from "../../components/DateRangePicker"
+import { useStoreActions } from "easy-peasy"
+import Cookies from 'cookies'
 
 const calcNumberOfNightsBetweenDates = (startDate, endDate) => {
-  const start = new Date(startDate); //clone
-  const end = new Date(endDate); //clone
-  let dayCount = 0;
+  const start = new Date(startDate) //clone
+  const end = new Date(endDate) //clone
+  let dayCount = 0
 
   while (end > start) {
-    dayCount++;
-    start.setDate(start.getDate() + 1);
+    dayCount++
+    start.setDate(start.getDate() + 1)
   }
 
-  return dayCount;
+  return dayCount
 };
 
-export default function House(props) {
-  const [dateChosen, setDateChosen] = useState(false);
+export default function House({ house, nextbnb_session }) {
+  const [dateChosen, setDateChosen] = useState(false)
   const [numberOfNightsBetweenDates, setNumberOfNightsBetweenDates] =
-    useState(0);
+    useState(0)
   const setShowLoginModal = useStoreActions(
     (actions) => actions.modals.setShowLoginModal
-  );
+  )
+  const setLoggedIn = useStoreActions((actions) => actions.login.setLoggedIn)
+  useEffect(() => {
+    if (nextbnb_session) {
+      setLoggedIn(true)
+    }
+  }, [])
 
   return (
     <Layout
@@ -87,12 +94,15 @@ export default function House(props) {
   );
 }
 
-export async function getServerSideProps({ query }) {
-  const { id } = query;
+export async function getServerSideProps({ req, res, query }) {
+  const { id } = query
+  const cookies = new Cookies(req, res)
+  const nextbnb_session = cookies.get('nextbnb_session')
 
   return {
     props: {
       house: houses.filter((house) => house.id === parseInt(id))[0],
+      nextbnb_session: nextbnb_session || null
     },
-  };
+  }
 }
