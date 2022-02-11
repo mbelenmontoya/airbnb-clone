@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react"
 import Head from "next/head"
-import houses from "../../houses.js"
 import Layout from "../../components/Layout"
 import DateRangePicker from "../../components/DateRangePicker"
 import { useStoreActions } from "easy-peasy"
 import Cookies from 'cookies'
+import { House as HouseModel } from '../../model.js'
 
 const calcNumberOfNightsBetweenDates = (startDate, endDate) => {
   const start = new Date(startDate) //clone
@@ -38,14 +38,14 @@ export default function House({ house, nextbnb_session }) {
       content={
         <div className="container">
           <Head>
-            <title>{props.house.title}</title>
+            <title>{house.title}</title>
           </Head>
           <article>
-            <img src={props.house.picture} width="100%" alt="House picture" />
+            <img src={ `/img/${house.picture}` } width="100%" alt="House picture" />
             <p>
-              {props.house.type} - {props.house.town}
+              {house.type} - {house.town}
             </p>
-            <p>{props.house.title}</p>
+            <p>{house.title}</p>
           </article>
           <aside>
             <h2>Choose a date</h2>
@@ -60,10 +60,10 @@ export default function House({ house, nextbnb_session }) {
             {dateChosen && (
               <div>
                 <h2>Price per night</h2>
-                <p>${props.house.price}</p>
+                <p>${house.price}</p>
                 <h2>Total price for booking</h2>
                 <p>
-                  ${(numberOfNightsBetweenDates * props.house.price).toFixed(2)}
+                  ${(numberOfNightsBetweenDates * house.price).toFixed(2)}
                 </p>
                 <button
                   className="reserve"
@@ -99,9 +99,11 @@ export async function getServerSideProps({ req, res, query }) {
   const cookies = new Cookies(req, res)
   const nextbnb_session = cookies.get('nextbnb_session')
 
+  const house = await HouseModel.findByPk(id)
+
   return {
     props: {
-      house: houses.filter((house) => house.id === parseInt(id))[0],
+      house: house.dataValues,
       nextbnb_session: nextbnb_session || null
     },
   }

@@ -1,14 +1,22 @@
 import Cookies from 'cookies'
 import { useStoreActions } from 'easy-peasy'
 import { useEffect } from 'react'
+import { House as HouseModel } from '../model.js'
 
-
-import houses from '../houses.js'
 import House from '../components/House'
 import Layout from '../components/Layout'
 
-const content = (
-  <div>
+export default function Home({ nextbnb_session, houses }) {
+  const setLoggedIn = useStoreActions((actions) => actions.login.setLoggedIn)
+
+  useEffect(() => {
+    if (nextbnb_session) {
+      setLoggedIn(true)
+    }
+  }, [])
+
+  return <Layout content={
+    <div>
       <h2>Places to stay</h2>
 
       <div className="houses">
@@ -26,27 +34,19 @@ const content = (
         }
       `}</style>
     </div>
-)
-
-export default function Home({ nextbnb_session }) {
-  const setLoggedIn = useStoreActions((actions) => actions.login.setLoggedIn)
-  
-  useEffect(() => {
-    if (nextbnb_session) {
-      setLoggedIn(true)
-    }
-  }, [])
-
-  return <Layout content={content} />
+  } />
 }
 
 export async function getServerSideProps({ req, res, query }) {
   const cookies = new Cookies(req, res)
   const nextbnb_session = cookies.get('nextbnb_session')
 
+  const houses = await HouseModel.findAndCountAll()
+
   return {
     props: {
-      nextbnb_session: nextbnb_session || null
+      nextbnb_session: nextbnb_session || null,
+      houses: houses.rows.map((house) => house.dataValues)
     }
   }
 }

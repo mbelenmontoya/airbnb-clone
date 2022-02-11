@@ -4,7 +4,7 @@ export default function House(props) {
     return (
         <Link href="/houses/[id]" as={'/houses/' + props.id}>
             <div>
-                <img src={props.picture} width="100%" alt="House picture" />
+                <img src={ `/img/${props.picture}` } width="100%" alt="House picture" />
                 <p>
                     {props.type} - {props.town}
                 </p>
